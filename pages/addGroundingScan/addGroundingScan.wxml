@@ -1,0 +1,33 @@
+<!--pages/addScan/addScan.wxml-->
+<view class="container">
+  <view class="section">
+    <view class="btn-area">
+      <button bindtap="addScan" type="default" size="mini">扫描FNSKU</button>
+    </view>
+  </view>
+  <!-- <camera style="width: 100%; height: 300px;" mode="scanCode" bindscancode="scanHandler" binderror="error">
+  </camera> -->
+  <view class="product-list">
+    <view class="product-item" wx:for="{{groundingList}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
+      <movable-area>
+        <movable-view out-of-bounds="true" direction="horizontal" x="{{product.xmove}}" inertia="true" data-productIndex="{{index}}" bindchange="handleMovableChange">
+          <view class="product-item-movable" id="{{product.id}}" >
+            <image class="product-delete-icon" src="../../images/icon-upload.png" data-productIndex="{{index}}" bindtap="upload"></image>
+            <view class="product-movable-item" bindtap="addWareScan" data-productIndex="{{index}}">
+              <view class="product-movable-item-name">{{product.scancode}}</view>
+              <view class="product-movable-item-code">{{product.warecode}}</view>
+            </view>
+            <view class="product-movable-item product-movable-item-amount">
+              <input type="number" class="product-movable-input" 
+                value="{{product.amount}}"
+                data-productIndex="{{index}}"
+                bindinput="handelInput"/>
+                <text decode="{{true}}" space="{{true}}">&nbsp;&nbsp;{{product.status}}</text>
+            </view>
+          </view>
+        </movable-view>
+      </movable-area>
+      <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
+    </view>
+  </view>
+</view>

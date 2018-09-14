@@ -1,0 +1,54 @@
+<!--index.wxml-->
+<view class="container">
+  <toast hidden="{{tipsHidden}}" icon="warn" duration="3000" bindchange="toHideTips">
+    请输入批次
+  </toast>
+
+  <view class="create">
+    <view class="section">
+      <input bindinput="bindTask" placeholder="添加上架批次" value="{{task}}"></input>
+    </view>
+    <view class="section">
+      <view class="btn-area">
+        <button bindtap="toCreate" type="default" size="mini">添加</button>
+      </view>
+    </view>
+  </view>
+  <!-- <view class="lists">
+    <block wx:for-items="{{taskList}}">
+        <view class="task-li un-done">
+          <view class="task-li-con" id="{{item.id}}" bindtap="batchdetail">
+            <view class="icon-done"></view>
+            <view class="content">{{item.text}}</view>
+          </view>
+        </view>
+    </block>
+  </view> -->
+
+  <view class="product-list">
+    <view class="product-item" wx:for="{{groundingBatchList}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
+      <movable-area>
+        <movable-view out-of-bounds="true" direction="horizontal" x="{{product.xmove}}" 
+          inertia="true" 
+          data-productIndex="{{index}}"
+          bindchange="handleMovableChange">
+          <view class="product-item-movable">
+            <!-- <image class="product-delete-icon" 
+              src="../../images/icon-upload.png" 
+              data-productIndex="{{index}}"
+              bindtap="reupload"></image> -->
+            <view class="product-movable-item" id="{{product.id}}" bindtap="batchdetail">
+              <view class="product-movable-item-name">{{product.text}}</view>
+              <view class="product-movable-item-code">{{product.time}}</view>
+            </view>
+            <!-- <view class="product-movable-item product-movable-item-amount">
+            .
+            <text>{{product.status}}</text>
+            </view> -->
+          </view>
+        </movable-view>
+      </movable-area>
+      <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
+    </view>
+  </view>
+</view>

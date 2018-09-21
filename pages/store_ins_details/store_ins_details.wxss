@@ -1,5 +1,4 @@
-/* pages/addScan/addScan.wxss */
-
+/* pages/store_ins_details/store_ins_details.wxss */
 .container {
   min-height: 100%;
   background-color: #f8f8f8;
@@ -108,7 +107,8 @@
 
 .product-list .product-item-movable .product-movable-item-amount {
   flex: 0 0 auto;
-  padding-right: 80rpx;
+  padding-right: 10rpx;
+  color: #71747A;
   /* position: relative; */
 }
 

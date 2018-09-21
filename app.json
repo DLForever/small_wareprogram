@@ -7,7 +7,8 @@
     "pages/scanList/scanList",
     "pages/addGrounding/addGrounding",
     "pages/groundingList/groundingList",
-    "pages/addGroundingScan/addGroundingScan"
+    "pages/addGroundingScan/addGroundingScan",
+    "pages/store_ins_details/store_ins_details"
   ],
   "window": {
     "backgroundTextStyle": "light",
@@ -28,6 +29,10 @@
       {
         "pagePath": "pages/addGrounding/addGrounding",
         "text": "添加上架"
+      },
+      {
+        "pagePath": "pages/store_ins_details/store_ins_details",
+        "text": "入库详情"
       }
     ]
   }

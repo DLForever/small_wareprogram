@@ -129,7 +129,7 @@
 .product-list .product-item-movable .product-movable-item-amount {
   flex: 0 0 auto;
   padding-right: 80rpx;
-  position: relative;
+  /* position: relative; */
 }
 
 .product-list .product-item-movable .product-movable-item-amount input {

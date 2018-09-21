@@ -19,7 +19,6 @@
               <view class="product-movable-item-code">{{product.time}}</view>
             </view>
             <view class="product-movable-item product-movable-item-amount">
-              .
               <text>{{product.status}}</text>
             </view>
           </view>

@@ -1,30 +1,37 @@
 <!--pages/store_ins_details/store_ins_details.wxml-->
 <view class="container">
   <view class="section">
+    <input bindinput="bindTask" placeholder="输入物流单号" value="{{logistics_number}}"></input>
+  </view>
+  <view class="section">
+    <view class="btn-area">
+      <button bindtap="addLogisticsNumber" type="default" size="mini">提交</button>
+    </view>
     <view class="btn-area">
       <button bindtap="scanLogisticsNumber" type="default" size="mini">扫描物流单号</button>
     </view>
+
   </view>
   <view class="product-list">
     <view class="product-item" wx:for="{{detailsList}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
-          <view class="product-item-movable">
-            <view class="product-movable-item">
-              <view class="product-movable-item-name">{{product.batch_number}}</view>
-              <view class="product-movable-item-code">{{product.user_remark}}</view>
-            </view>
-            <view class="product-movable-item product-movable-item-amount">
-              {{product.logistics_number}}
-            </view>
-          </view>
+      <view class="product-item-movable">
+        <view class="product-movable-item">
+          <view class="product-movable-item-name">{{product.batch_number}}</view>
+          <view class="product-movable-item-code">{{product.user_remark}}</view>
+        </view>
+        <view class="product-movable-item product-movable-item-amount">
+          {{product.logistics_number}}
+        </view>
+      </view>
     </view>
 
     <view class="product-item" wx:for="{{detailsList2}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
-          <view class="product-item-movable">
-            <view class="product-movable-item">
-              <view class="product-movable-item-name">{{product.fnsku}}</view>
-              <view class="product-movable-item-code">{{product.arrive_sum}}</view>
-            </view>
-          </view>
+      <view class="product-item-movable">
+        <view class="product-movable-item">
+          <view class="product-movable-item-name">{{product.fnsku}}</view>
+          <view class="product-movable-item-code">{{product.arrive_sum}}</view>
+        </view>
+      </view>
     </view>
   </view>
 </view>

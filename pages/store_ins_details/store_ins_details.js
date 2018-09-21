@@ -6,7 +6,8 @@ Page({
    */
   data: {
     detailsList: [],
-    detailsList2: []
+    detailsList2: [],
+    logistics_number: ''
   },
 
   /**
@@ -64,6 +65,41 @@ Page({
   onShareAppMessage: function () {
 
   },
+  bindTask: function (e) {
+    this.setData({
+      logistics_number: e.detail.value
+    })
+  },
+  addLogisticsNumber: function () {
+    var that = this
+    wx.request({
+      url: 'http://47.74.177.128:3000/admin/store_ins/info',
+      header: {
+        'Authorization': wx.getStorageSync('id_token'),
+      },
+      data: {
+        logistics_number: that.data.logistics_number
+      },
+      method: 'GET',
+      success: function (res) {
+        if (res.data.code == 200) {
+          console.log(res.data.data)
+          that.setData({
+            detailsList: [res.data.data],
+            detailsList2: res.data.data.product_store_ins
+          })
+          that.setData({
+            logistics_number: ''
+          })
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: res.data.message,
+          })
+        }
+      }
+    })
+  },
   scanLogisticsNumber: function () {
     var that = this
     wx.scanCode({
@@ -80,10 +116,6 @@ Page({
           success: function(res) {
             if(res.data.code == 200) {
               console.log(res.data.data)
-              // res.data.data.product_store_ins.forEach((data) => {
-              //   that.detailsList2 = data
-              // })
-              // console.log(that.detailsList2)
               that.setData({
                 detailsList: [res.data.data],
                 detailsList2: res.data.data.product_store_ins

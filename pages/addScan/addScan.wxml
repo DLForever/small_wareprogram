@@ -1,6 +1,12 @@
 <!--pages/addScan/addScan.wxml-->
 <view class="container">
   <view class="section">
+    <input bindinput="bindTask" placeholder="输入物流单号" value="{{logistics_number}}"></input>
+  </view>
+  <view class="section">
+    <view class="btn-area">
+      <button bindtap="addLogisticsNumber" type="default" size="mini">提交</button>
+    </view>
     <view class="btn-area">
       <button bindtap="addScan" type="default" size="mini">单次扫描二维码</button>
     </view>

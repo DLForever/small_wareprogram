@@ -12,6 +12,7 @@ const scanData = ({
     status: '',
     codetemp: '',
     scanArea: [],
+    logistics_number: ''
   },
 
 
@@ -92,6 +93,79 @@ const scanData = ({
    */
   onShareAppMessage: function() {
 
+  },
+  bindTask: function (e) {
+    this.setData({
+      logistics_number: e.detail.value
+    })
+  },
+  addLogisticsNumber: function() {
+    var that = this
+    this.data.codetemp = this.data.logistics_number
+    let showList = that.data.showList
+    let temp = wx.getStorageSync('scancodetemp') || []
+    let temp2 = temp.filter(this.filterBatchs)[0]['codes']
+    let status = ""
+    if (temp2.indexOf(this.data.codetemp) == -1) {
+      temp2.push(this.data.codetemp)
+      wx.setStorageSync('scancodetemp', temp)
+      let tempTime = util.formatTime(new Date())
+      wx.request({
+        url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
+        data: {
+          logistics_number: this.data.codetemp,
+          date: tempTime
+        },
+        header: {
+          'Authorization': wx.getStorageSync('id_token'),
+        },
+        method: 'POST',
+        success: function (res) {
+          console.log(res)
+          if (res.data.code == 200) {
+            status = "成功"
+            showList.push({
+              time: tempTime,
+              scancode: that.data.codetemp,
+              id: that.data.batchId,
+              status: status
+            })
+            that.setData({
+              showList: showList,
+              logistics_number: ''
+            })
+            let showListTemp = wx.getStorageSync("showList") || []
+            showListTemp.push(showList[showList.length - 1])
+            wx.setStorageSync("showList", showListTemp)
+          } else {
+            status = "失败"
+            showList.push({
+              time: tempTime,
+              scancode: that.data.codetemp,
+              id: that.data.batchId,
+              status: status
+            })
+            that.setData({
+              showList: showList,
+            })
+            let showListTemp = wx.getStorageSync("showList") || []
+            showListTemp.push(showList[showList.length - 1])
+            wx.setStorageSync("showList", showListTemp)
+            wx.showModal({
+              title: '提示',
+              content: res.data.message,
+            })
+          }
+        },
+      })
+
+    } else {
+      wx.showToast({
+        title: '重复啦',
+        icon: 'loading',
+        duration: 1000
+      })
+    }
   },
   filterBatchs: function(element) {
     return (element['id'] == this.data.batchId)

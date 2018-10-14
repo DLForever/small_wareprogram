@@ -4,13 +4,33 @@
     请输入批次
   </toast>
 
+  <!--弹窗-->
+  <view class="modal-mask" bindtap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></view>
+  <view class="modal-dialog" wx:if="{{showModal}}">
+    <view class="modal-title">添加批次</view>
+    <view class="modal-content">
+      <view class="modal-input">
+        <input placeholder-class="input-holder" bindinput="bindTask" value="{{task}}" class="input" placeholder="请输入批次"></input>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="btn-cancel" bindtap="onCancel" data-status="cancel">取消</view>
+      <view class="btn-confirm" bindtap="toCreate" data-status="confirm">确定</view>
+    </view>
+  </view>
+
   <view class="create">
-    <view class="section">
-      <input bindinput="bindTask" placeholder="添加入库批次" value="{{task}}"></input>
+    <!-- <view class="section">
+      <input bindinput="bindTask" placeholder="输入入库批次" value="{{task}}"></input>
     </view>
     <view class="section">
       <view class="btn-area">
         <button bindtap="toCreate" type="default" size="mini">添加</button>
+      </view>
+    </view> -->
+    <view class="section">
+      <view class="btn-area">
+        <button bindtap="showDialogBtn" type="default" size="mini">添加批次</button>
       </view>
     </view>
   </view>
@@ -28,16 +48,13 @@
   <view class="product-list">
     <view class="product-item" wx:for="{{taskList}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
       <movable-area>
-        <movable-view out-of-bounds="true" direction="horizontal" x="{{product.xmove}}" 
-          inertia="true" 
-          data-productIndex="{{index}}"
-          bindchange="handleMovableChange">
+        <movable-view out-of-bounds="true" direction="horizontal" x="{{product.xmove}}" inertia="true" data-productIndex="{{index}}" bindchange="handleMovableChange">
           <view class="product-item-movable">
             <!-- <image class="product-delete-icon" 
               src="../../images/icon-upload.png" 
               data-productIndex="{{index}}"
               bindtap="reupload"></image> -->
-            <view class="product-movable-item" id="{{product.id}}" bindtap="batchdetail">
+            <view class="product-movable-item" data-index="{{index}}" id="{{product.id}}" bindtap="batchdetail">
               <view class="product-movable-item-name">{{product.text}}</view>
               <view class="product-movable-item-code">{{product.time}}</view>
             </view>
@@ -50,5 +67,9 @@
       </movable-area>
       <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
     </view>
+  </view>
+  <view wx:if="{{taskList.length==0}}" class="remind-box">
+    <image class="remind-img" src="/images/nothing.png"></image>
+    <text class="remind-text">暂无数据</text>
   </view>
 </view>

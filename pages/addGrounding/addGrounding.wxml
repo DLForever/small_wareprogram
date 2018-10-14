@@ -4,16 +4,37 @@
     请输入批次
   </toast>
 
-  <view class="create">
+  <!--弹窗-->
+  <view class="modal-mask" bindtap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></view>
+  <view class="modal-dialog" wx:if="{{showModal}}">
+    <view class="modal-title">添加批次</view>
+    <view class="modal-content">
+      <view class="modal-input">
+        <input placeholder-class="input-holder" bindinput="bindTask" value="{{task}}" class="input" placeholder="请输入批次"></input>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="btn-cancel" bindtap="onCancel" data-status="cancel">取消</view>
+      <view class="btn-confirm" bindtap="toCreate" data-status="confirm">确定</view>
+    </view>
+  </view>
+
+  <!-- <view class="create">
     <view class="section">
-      <input bindinput="bindTask" placeholder="添加上架批次" value="{{task}}"></input>
+      <input bindinput="bindTask" placeholder="输入上架批次" value="{{task}}"></input>
     </view>
     <view class="section">
       <view class="btn-area">
         <button bindtap="toCreate" type="default" size="mini">添加</button>
       </view>
     </view>
-  </view>
+  </view> -->
+
+  <view class="section">
+      <view class="btn-area">
+        <button bindtap="showDialogBtn" type="default" size="mini">添加批次</button>
+      </view>
+    </view>
   <!-- <view class="lists">
     <block wx:for-items="{{taskList}}">
         <view class="task-li un-done">
@@ -50,5 +71,9 @@
       </movable-area>
       <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
     </view>
+  </view>
+  <view wx:if="{{groundingBatchList.length==0}}" class="remind-box">
+    <image class="remind-img" src="/images/nothing.png"></image>
+    <text class="remind-text">暂无数据</text>
   </view>
 </view>

@@ -44,9 +44,12 @@ Page({
           console.log('there is no id_token')
         }
         if (res.data.code == 200) {
-          wx.switchTab({
-            url: '../index/index'
+          wx.redirectTo({
+            url: '/pages/home/home',
           })
+          // wx.switchTab({
+          //   url: '../index/index'
+          // })
         } else {
           wx.showToast({
             title: '密码错误',

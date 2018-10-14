@@ -1,4 +1,6 @@
 /* pages/store_ins_details/store_ins_details.wxss */
+@import '../common/common.wxss';
+
 .container {
   min-height: 100%;
   background-color: #f8f8f8;
@@ -9,8 +11,23 @@
   /* text-align: center; */
 }
 
+/* .section {
+  display: flex;
+  flex-flow: row wrap;
+  align-content: flex-start;
+  background: #fff;
+  border-bottom: 1rpx solid #e5e5e5;
+  padding: 15rpx 10rpx 10rpx;
+  min-height: 350rpx;
+  overflow: hidden;
+} */
+
 .container .btn-area {
   text-align: center;
+}
+
+.container .btn-area .btn-scan {
+  background-color: skyblue
 }
 
 .container .delete-btn {

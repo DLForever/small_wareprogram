@@ -251,9 +251,11 @@ Page({
           groundingListtemp2['time'] = util.formatTime(new Date())
         } else {
           groundingListtemp2['status'] = "失败"
+          // app.showErrorModal(res.data.message, "提示")
           wx.showModal({
-            title: '提示',
+            title: '出错啦',
             content: res.data.message,
+            showCancel: false
           })
         }
         groundingListtemp2['amount'] = that.data.amount

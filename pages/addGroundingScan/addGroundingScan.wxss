@@ -116,12 +116,14 @@
   padding: 10rpx;
   opacity: 0.8;
   background: #FFFFFF;
-  width: 80rpx;
+  width: 85rpx;
   border: 2rpx solid #E0E1E3;
+  border-radius: 25px;
   font-family: PingFangSC-Semibold;
   font-size: 28rpx;
   color: #383A3D;
   line-height: 60rpx;
+  /* height: 5rpx; */
 }
 
 .product-list .product-item-movable .product-movable-item-amount text {

@@ -1,14 +1,33 @@
 <!--pages/store_ins_details/store_ins_details.wxml-->
 <view class="container">
-  <view class="section">
+  <!-- <view class="section">
     <input bindinput="bindTask" placeholder="输入物流单号" value="{{logistics_number}}"></input>
+  </view> -->
+
+  <!--弹窗-->
+  <view class="modal-mask" bindtap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></view>
+  <view class="modal-dialog" wx:if="{{showModal}}">
+    <view class="modal-title">物流单号</view>
+    <view class="modal-content">
+      <view class="modal-input">
+        <input placeholder-class="input-holder" bindinput="bindTask" value="{{logistics_number}}" class="input" placeholder="请输入物流单号"></input>
+      </view>
+    </view>
+    <view class="modal-footer">
+      <view class="btn-cancel" bindtap="onCancel" data-status="cancel">取消</view>
+      <view class="btn-confirm" bindtap="addLogisticsNumber" data-status="confirm">确定</view>
+    </view>
   </view>
+
   <view class="section">
+    <!-- <view class="btn-area">
+      <button bindtap="addLogisticsNumber" type="default" size="mini">添加</button>
+    </view> -->
     <view class="btn-area">
-      <button bindtap="addLogisticsNumber" type="default" size="mini">提交</button>
+      <button bindtap="showDialogBtn" type="default" size="mini">输入物流单号</button>
     </view>
     <view class="btn-area">
-      <button bindtap="scanLogisticsNumber" type="default" size="mini">扫描物流单号</button>
+      <button class="btn-scan" bindtap="scanLogisticsNumber" type="primary" size="mini">扫描物流单号</button>
     </view>
 
   </view>
@@ -29,9 +48,13 @@
       <view class="product-item-movable">
         <view class="product-movable-item">
           <view class="product-movable-item-name">{{product.fnsku}}</view>
-          <view class="product-movable-item-code">{{product.arrive_sum}}</view>
+          <view class="product-movable-item-code">{{product.plan_sum}}</view>
         </view>
       </view>
     </view>
+  </view>
+  <view wx:if="{{detailsList.length==0}}" class="remind-box">
+    <image class="remind-img" src="/images/nothing.png"></image>
+    <text class="remind-text">暂无数据</text>
   </view>
 </view>

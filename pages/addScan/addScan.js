@@ -100,6 +100,14 @@ const scanData = ({
     })
   },
   addLogisticsNumber: function() {
+    if (this.data.logistics_number.trim().length < 1) {
+      wx.showToast({
+        title: '请输入物流单号',
+        icon: 'none',
+        duration: 1000
+      })
+      return false
+    }
     var that = this
     this.data.codetemp = this.data.logistics_number
     let showList = that.data.showList
@@ -154,6 +162,7 @@ const scanData = ({
             wx.showModal({
               title: '提示',
               content: res.data.message,
+              showCancel: false
             })
           }
         },
@@ -285,8 +294,9 @@ const scanData = ({
             }
           }
           wx.showModal({
-            title: '提示',
+            title: '出错啦',
             content: res.data.message,
+            showCancel: false
           })
         }
         wx.setStorageSync("showList", showListtemp)

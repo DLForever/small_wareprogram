@@ -1,0 +1,32 @@
+<view class="container">
+    <view class="banner">
+        <image src="../../images/list1.png"></image>
+    </view>
+
+    <view class="list-box">
+        <view class="newest-list">
+            <navigator url="../index/index">
+                <image src="../../images/s4.png"></image>
+                <view class="newest-text"><text>入库</text></view>
+            </navigator>
+        </view>
+        <view class="newest-list">
+            <navigator url="../store_ins_details/store_ins_details">
+                <image src="../../images/pick.png"></image>
+                <view class="newest-text"><text>拣货</text></view>
+            </navigator>
+        </view>
+        <view class="newest-list">
+            <navigator url="../addGrounding/addGrounding">
+                <image src="../../images/s5.png"></image>
+                <view class="newest-text"><text>上架</text></view>
+            </navigator>
+        </view>
+        <view class="newest-list">
+            <navigator url="../store_ins_details/store_ins_details">
+                <image src="../../images/s6.png"></image>
+                <view class="newest-text"><text>详情</text></view>
+            </navigator>
+        </view>
+    </view>
+</view>

@@ -71,6 +71,14 @@ Page({
     })
   },
   addLogisticsNumber: function () {
+    if (this.data.logistics_number.trim().length < 1) {
+      wx.showToast({
+        title: '请输入物流单号',
+        icon: 'none',
+        duration: 1000
+      })
+      return false
+    }
     var that = this
     wx.request({
       url: 'http://47.74.177.128:3000/admin/store_ins/info',
@@ -88,13 +96,15 @@ Page({
             detailsList: [res.data.data],
             detailsList2: res.data.data.product_store_ins
           })
+          that.hideModal();
           that.setData({
             logistics_number: ''
           })
         } else {
           wx.showModal({
-            title: '提示',
+            title: '出错啦',
             content: res.data.message,
+            showCancel: false
           })
         }
       }
@@ -123,13 +133,46 @@ Page({
               
             } else {
               wx.showModal({
-                title: '提示',
+                title: '出错啦',
                 content: res.data.message,
+                showCancel: false
               })
             }
           }
         })
       }
     })
+  },
+  /**
+   * 弹窗
+   */
+  showDialogBtn: function () {
+    this.setData({
+      showModal: true
+    })
+  },
+  /**
+   * 弹出框蒙层截断touchmove事件
+   */
+  preventTouchMove: function () { },
+  /**
+   * 隐藏模态对话框
+   */
+  hideModal: function () {
+    this.setData({
+      showModal: false
+    });
+  },
+  /**
+   * 对话框取消按钮点击事件
+   */
+  onCancel: function () {
+    this.hideModal();
+  },
+  /**
+   * 对话框确认按钮点击事件
+   */
+  onConfirm: function () {
+    this.hideModal();
   }
 })

@@ -5,10 +5,10 @@
   </view>
   <view class="section">
     <view class="btn-area">
-      <button bindtap="addLogisticsNumber" type="default" size="mini">提交</button>
+      <button bindtap="addLogisticsNumber" type="default" size="mini">添加</button>
     </view>
     <view class="btn-area">
-      <button bindtap="addScan" type="default" size="mini">单次扫描二维码</button>
+      <button bindtap="addScan" class="btn-scan" size="mini">单次扫码</button>
     </view>
   </view>
   <camera style="width: 100%; height: 300px;" mode="scanCode" bindscancode="scanHandler" scan-area="[0, 0, 300, 300]" binderror="error">
@@ -32,5 +32,9 @@
       </movable-area>
       <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
     </view>
+  </view>
+  <view wx:if="{{showList.length==0}}" class="remind-box">
+    <image class="remind-img" src="/images/nothing.png"></image>
+    <text class="remind-text">暂无数据</text>
   </view>
 </view>

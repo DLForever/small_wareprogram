@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/login/login",
+    "pages/home/home",
     "pages/index/index",
     "pages/logs/logs",
     "pages/addScan/addScan",
@@ -15,25 +16,5 @@
     "navigationBarBackgroundColor": "#fff",
     "navigationBarTitleText": "海外仓系统",
     "navigationBarTextStyle": "black"
-  },
-  "tabBar": {
-    "color": "#dddddd",
-    "selectedColor": "#1992F5",
-    "borderStyle": "black",
-    "backgroundColor": "#ffffff",
-    "list": [
-      {
-        "pagePath": "pages/index/index",
-        "text": "添加入库"
-      },
-      {
-        "pagePath": "pages/addGrounding/addGrounding",
-        "text": "添加上架"
-      },
-      {
-        "pagePath": "pages/store_ins_details/store_ins_details",
-        "text": "入库详情"
-      }
-    ]
   }
 }

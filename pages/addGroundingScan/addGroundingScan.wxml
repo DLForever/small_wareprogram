@@ -30,4 +30,8 @@
       <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
     </view>
   </view>
+   <view wx:if="{{groundingList.length==0}}" class="remind-box">
+    <image class="remind-img" src="/images/nothing.png"></image>
+    <text class="remind-text">暂无数据</text>
+  </view>
 </view>

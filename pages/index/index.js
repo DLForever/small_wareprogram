@@ -13,6 +13,7 @@ const pageData = {
     batchId: 0,
     tipsHidden: true,
     hasUserInfo: false,
+    showModal: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
   //事件处理函数
@@ -84,11 +85,15 @@ const pageData = {
     })
   },
   toCreate: function() {
+    if (this.data.task.trim().length < 1) {
+      this.toShowTips();
+      return
+    }
     if (wx.getStorageSync("batchId") == 0) {
       wx.setStorageSync("batchId", 1)
       this.data.batchId = wx.getStorageSync("batchId")
       console.log('batch:' + this.data.batchId)
-    }else {
+    } else {
       this.data.batchId = wx.getStorageSync("batchId") + 1
       wx.setStorageSync("batchId", this.data.batchId)
       console.log('batch2:' + this.data.batchId)
@@ -113,6 +118,7 @@ const pageData = {
       });
       wx.setStorageSync('taskList', taskList);
       wx.setStorageSync('scancodetemp', scancodetemp);
+      this.hideModal();
     }
   },
   batchdetail: function(event) {
@@ -137,7 +143,7 @@ const pageData = {
   /**
    * 显示删除按钮
    */
-  showDeleteButton: function (e) {
+  showDeleteButton: function(e) {
     let productIndex = e.currentTarget.dataset.productindex
     this.setXmove(productIndex, -65)
   },
@@ -145,15 +151,15 @@ const pageData = {
   /**
    * 隐藏删除按钮
    */
-  hideDeleteButton: function (e) {
+  hideDeleteButton: function(e) {
     let productIndex = e.currentTarget.dataset.productindex
 
     this.setXmove(productIndex, 0)
   },
   /**
-  * 设置movable-view位移
-  */
-  setXmove: function (productIndex, xmove) {
+   * 设置movable-view位移
+   */
+  setXmove: function(productIndex, xmove) {
     let productList = this.data.taskList
     productList[productIndex].xmove = xmove
 
@@ -165,7 +171,7 @@ const pageData = {
   /**
    * 处理movable-view移动事件
    */
-  handleMovableChange: function (e) {
+  handleMovableChange: function(e) {
     if (e.detail.source === 'friction') {
       if (e.detail.x < -30) {
         this.showDeleteButton(e)
@@ -179,7 +185,7 @@ const pageData = {
   /**
    * 删除产品
    */
-  handleDeleteProduct: function (e) {
+  handleDeleteProduct: function(e) {
     let productIndex = e.currentTarget.dataset.productindex
     let productList = this.data.taskList
 
@@ -193,17 +199,49 @@ const pageData = {
       this.setXmove(productIndex, 0)
     }
   },
-  delet: function (e) {
+  delet: function(e) {
     var that = this
     wx.showModal({
       title: '提示',
       content: "确定删除吗？",
-      success: function (res) {
+      success: function(res) {
         if (res.confirm) {
           that.handleDeleteProduct(e)
         }
       }
     })
+  },
+  /**
+   * 弹窗
+   */
+  showDialogBtn: function() {
+    this.setData({
+      showModal: true
+    })
+  },
+  /**
+   * 弹出框蒙层截断touchmove事件
+   */
+  preventTouchMove: function() {},
+  /**
+   * 隐藏模态对话框
+   */
+  hideModal: function() {
+    this.setData({
+      showModal: false
+    });
+  },
+  /**
+   * 对话框取消按钮点击事件
+   */
+  onCancel: function() {
+    this.hideModal();
+  },
+  /**
+   * 对话框确认按钮点击事件
+   */
+  onConfirm: function() {
+    this.hideModal();
   }
 }
 

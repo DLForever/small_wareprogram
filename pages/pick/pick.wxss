@@ -1,0 +1,4 @@
+/* pages/pick/pick.wxss */
+.container .btn-area {
+  text-align: center;
+}

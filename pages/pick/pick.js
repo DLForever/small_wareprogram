@@ -1,4 +1,4 @@
-// pages/home/home.js
+// pages/pick/pick.js
 Page({
 
   /**
@@ -63,36 +63,7 @@ Page({
   onShareAppMessage: function () {
 
   },
-  done_package: function () {
-    wx.scanCode({
-      success: (res) => {
-        console.log(res.result)
-        wx.request({
-          url: 'http://47.74.177.128:3000/admin/outbound_orders/' + res.result.split('_')[1] + '/done_change_label',
-          header: {
-            'Authorization': wx.getStorageSync('id_token'),
-          },
-          method: 'GET',
-          success: function (res) {
-            if (res.data.code == 200) {
-              wx.showModal({
-                title: '成功',
-                content: "换标成功!",
-                showCancel: false
-              })
-            } else {
-              wx.showModal({
-                title: '提示',
-                content: res.data.message,
-                showCancel: false
-              })
-            }
-          }
-        })
-      }
-    })
-  },
-  done_pick: function () {
+  done_pick: function() {
     wx.scanCode({
       success: (res) => {
         console.log(res.result)
@@ -120,5 +91,5 @@ Page({
         })
       }
     })
-  },
+  }
 })

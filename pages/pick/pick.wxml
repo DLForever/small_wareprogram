@@ -1,0 +1,12 @@
+<!--pages/pick/pick.wxml-->
+<view class="container">
+  <view class="section">
+    <view class="btn-area">
+      <button bindtap="done_pick" type="default" size="mini">拣货</button>
+    </view>
+  </view>
+   <view class="remind-box">
+    <image class="remind-img" src="/images/nothing.png"></image>
+    <text class="remind-text">暂无数据</text>
+  </view>
+</view>

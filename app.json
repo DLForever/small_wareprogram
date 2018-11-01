@@ -6,6 +6,7 @@
     "pages/logs/logs",
     "pages/addScan/addScan",
     "pages/scanList/scanList",
+    "pages/pick/pick",
     "pages/addGrounding/addGrounding",
     "pages/groundingList/groundingList",
     "pages/addGroundingScan/addGroundingScan",

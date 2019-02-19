@@ -1,5 +1,6 @@
 // pages/addGroundingScan/addGroundingScan.js
 const util = require('../../utils/util.js')
+const app = getApp()
 Page({
 
   /**
@@ -18,7 +19,12 @@ Page({
     listtemp: [],
     amount: 0,
     fillamount: 0,
-    isFnsku: 1
+    isFnsku: 1,
+    fnsku: undefined,
+    fnskuList: [],
+    selectAllStatus: false,
+    batchList: [],
+    wareList: []
   },
 
   /**
@@ -29,6 +35,7 @@ Page({
     try {
       this.setData({
         groundingList: wx.getStorageSync('groundingList').filter(this.filterBatchs) || []
+        // groundingList: wx.getStorageSync('groundingList') || []
       })
     } catch (e) {
       console.log('groundingList is empty , filter is not a function')
@@ -56,7 +63,7 @@ Page({
 
   },
 
-  /**
+  /** 
    * 生命周期函数--监听页面卸载
    */
   onUnload: function() {
@@ -84,12 +91,249 @@ Page({
 
   },
   handelInput: function(e) {
+    const index = e.currentTarget.dataset.productindex;
+    let groundingList = this.data.groundingList;
+    groundingList[index]['amount'] = Number(e.detail.value)
+    for (let i = 0; i < groundingList.length; i++) {
+      groundingList[i]['selected'] = false
+    }
     this.setData({
-      amount: e.detail.value
+      amount: e.detail.value,
+      groundingList: groundingList,
+      batchList: []
+    })
+  },
+  bindFnsku: function (e) {
+    this.setData({
+      fnsku: e.detail.value
     })
   },
   filterBatchs: function(element) {
-    return (element['id'] == this.data.groundBatchId)
+    element['selected'] = false
+    return (element['groundingId'] != '')
+  },
+  selectList(e) {
+    const index = e.currentTarget.dataset.index;
+    let groundingList = this.data.groundingList;
+    const selected = groundingList[index].selected;
+    let temparr = []
+    groundingList[index].selected = !selected;
+    for (let i = 0; i < groundingList.length; i++) {
+      if (groundingList[i].selected) {
+        temparr.push(groundingList[i])
+      }
+    }
+    // if(groundingList[index].selected) {
+    //   for (let i = 0; i < groundingList.length; i++) {
+    //     if (groundingList[i].selected) {
+    //       temparr.push(groundingList[index])
+    //     }
+    //   }
+    // }
+    this.setData({
+      groundingList: groundingList,
+      batchList: temparr
+    });
+    console.log('bat')
+    console.log(this.data.batchList)
+  },
+  /**
+   * 购物车全选事件
+   */
+  selectAll(e) {
+    let selectAllStatus = this.data.selectAllStatus;
+    selectAllStatus = !selectAllStatus;
+    let groundingList = this.data.groundingList;
+    let tempArr = []
+
+    for (let i = 0; i < groundingList.length; i++) {
+      groundingList[i].selected = selectAllStatus;
+      if (groundingList[i].selected == true) {
+        tempArr.push(groundingList[i])
+      }
+    }
+    // if(selectAllStatus == false) {
+    //   this.data.batchList = []
+    // }
+    this.setData({
+      selectAllStatus: selectAllStatus,
+      groundingList: groundingList,
+      batchList: tempArr
+    });
+  },
+  batchPutaway: function() {
+    if(this.data.batchList.length ==0) {
+      wx.showModal({
+        title: '出错啦',
+        content: '请选择fnsku',
+        showCancel: false
+      })
+      return
+    }
+    for(let i=0; i<this.data.batchList.length; i++) {
+      if(this.data.batchList[i]['warecode'] == '') {
+        wx.showModal({
+          title: '出错啦',
+          content: '请扫描库位',
+          showCancel: false
+        })
+        return
+      }
+    }
+    console.log(this.data.batchList)
+    let fnsku = []
+    let ware_house_name = []
+    let sum = []
+    for(let i = 0; i < this.data.batchList.length; i++) {
+      fnsku.push(this.data.batchList[i]['scancode'])
+      ware_house_name.push(this.data.batchList[i]['warecode'])
+      sum.push(this.data.batchList[i]['amount'])
+    }
+    // let productIndex = e.currentTarget.dataset.productindex
+    // let productList = this.data.groundingList
+    let timetemp2 = util.formatTime(new Date())
+    // console.log(productList[productIndex]['scancode'])
+
+    // function filterGroundinglist(element, index, array) {
+    //   return (element['groundingId'] == productList[productIndex]['groundingId'])
+    // }
+    // let groundingListtemp = wx.getStorageSync("groundingList")
+    // let groundingListtemp2 = groundingListtemp.filter(filterGroundinglist)[0]
+    var that = this
+    // console.log('that.data.amount:')
+    // console.log(productList)
+    wx.request({
+      // url: app.globalData.baseurl + '/admin/cargos/putaway_fnsku',
+      url: app.globalData.baseurl + '/admin/cargos/putaway_fnsku',
+      data: {
+        fnsku: fnsku,
+        ware_house_name: ware_house_name,
+        sum: sum,
+        date: util.formatTime(new Date())
+      },
+      header: {
+        'Authorization': wx.getStorageSync('id_token'),
+      },
+      method: 'POST',
+      success: function (res) {
+        console.log(res)
+        if (res.data.code == 200) {
+          for(let i = 0; i<that.data.groundingList.length; i++) {
+            if(that.data.groundingList[i]['selected']) {
+              that.data.groundingList[i]['status'] = '成功'
+              that.data.groundingList[i]['time'] = util.formatTime(new Date())
+            }
+          }
+          wx.setStorageSync("groundingList", that.data.groundingList)
+          that.setData({
+            groundingList: wx.getStorageSync('groundingList').filter(that.filterBatchs) || [],
+            batchList: []
+          })
+        } else {
+          for (let i = 0; i < that.data.groundingList.length; i++) {
+            if (that.data.groundingList[i]['selected']) {
+              that.data.groundingList[i]['status'] = '失败'
+            }
+          }
+          // app.showErrorModal(res.data.message, "提示")
+          wx.showModal({
+            title: '出错啦',
+            content: res.data.message,
+            showCancel: false
+          })
+        }
+        // groundingListtemp2['amount'] = that.data.amount
+        wx.setStorageSync("groundingList", that.data.groundingList)
+        that.setData({
+          groundingList: wx.getStorageSync('groundingList') || []
+        })
+      }
+    })
+  },
+  addFnsku: function() {
+    if (this.data.fnsku == undefined || this.data.fnsku.trim().length < 1) {
+      wx.showToast({
+        title: '请输入Fnsku',
+        icon: 'none',
+        duration: 1000
+      })
+      return
+    }
+    console.log(this.data.fnsku)
+    this.data.codetemp = this.data.fnsku
+    var that = this
+    wx.request({
+      // url: app.globalData.baseurl + '/admin/cargos/search_by_fnsku?query=' + that.data.fnsku,
+      url: app.globalData.baseurl + '/admin/cargos/search_by_fnsku?query=' + this.data.fnsku,
+      // data: {
+      //   query: this.data.fnsku
+      // },
+      header: {
+        'Authorization': wx.getStorageSync('id_token'),
+      },
+      method: 'GET',
+      success: function (res) {
+        if (res.data.code == 200) {
+          that.data.isFnsku = 1
+          res.data.data.forEach((data) => {
+            if (data.fnsku == that.data.codetemp) {
+              that.data.fillamount = data.arrive_sum
+              that.data.isFnsku = 0
+              that.data.wareList = data.cargo_ware_houses
+            }
+          })
+          console.log(123)
+          console.log(that.data.isFnsku)
+          if (that.data.isFnsku) {
+            wx.showModal({
+              title: '出错啦',
+              content: '请提供正确的fnsku',
+              showCancel: false
+            })
+            that.setData({
+              wareList: []
+            })
+            return
+          }
+          let groundingList = that.data.groundingList
+          let temp = wx.getStorageSync('groundingcodetemp') || []
+          // let temp2 = temp.filter(that.filterBatchs)[0]['codes']
+          let status = ""
+          if (wx.getStorageSync("groundingId") == 0) {
+            wx.setStorageSync("groundingId", 1)
+            that.data.groundingId = wx.getStorageSync("groundingId")
+            console.log('groundingId:' + that.data.groundingId)
+          } else {
+            that.data.groundingId = wx.getStorageSync("groundingId") + 1
+            wx.setStorageSync("groundingId", that.data.groundingId)
+            console.log('groundingId2:' + that.data.groundingId)
+          }
+          groundingList.push({
+            time: '',
+            scancode: that.data.codetemp,
+            id: that.data.groundBatchId,
+            groundingId: that.data.groundingId,
+            status: '待上架',
+            warecode: that.data.warecode,
+            amount: that.data.fillamount,
+            selected: false
+          })
+          that.setData({
+            groundingList: groundingList,
+            wareList: that.data.wareList
+          })
+          let groundingListTemp = wx.getStorageSync("groundingList") || []
+          groundingListTemp.push(groundingList[groundingList.length - 1])
+          wx.setStorageSync("groundingList", groundingListTemp)
+        } else {
+          wx.showModal({
+            title: '出错啦',
+            content: res.data.message,
+            showCancel: false
+          })
+        }
+      }
+    })
   },
   addScan: function(res) {
     // let productIndex = res.currentTarget.dataset.productindex
@@ -99,10 +343,12 @@ Page({
     try {
       wx.scanCode({
         success: (res) => {
+          console.log(res.result)
           this.data.codetemp = res.result
           that.data.fillamount = 0
           wx.request({
-            url: 'http://47.74.177.128:3000/admin/cargos/search_by_fnsku?query=' + res.result,
+            // url: app.globalData.baseurl + '/admin/cargos/search_by_fnsku?query=' + res.result,
+            url: app.globalData.baseurl + '/admin/cargos/search_by_fnsku?query=' + res.result,
             // data: {
             //   query: res.result
             // },
@@ -117,20 +363,24 @@ Page({
                   if(data.fnsku == that.data.codetemp) {
                     that.data.fillamount = data.arrive_sum
                     that.data.isFnsku = 0
-                    console.log(that.data.fillamount)
+                    that.data.wareList = data.cargo_ware_houses
                   }
                 })
+                
                 if(that.data.isFnsku) {
                   wx.showModal({
                     title: '出错啦',
                     content: '请提供正确的fnsku',
                     showCancel: false
                   })
+                  that.setData({
+                    wareList: []
+                  })
                   return
                 }
                 let groundingList = that.data.groundingList
                 let temp = wx.getStorageSync('groundingcodetemp') || []
-                let temp2 = temp.filter(that.filterBatchs)[0]['codes']
+                // let temp2 = temp.filter(that.filterBatchs)[0]['codes']
                 let status = ""
                 if (wx.getStorageSync("groundingId") == 0) {
                   wx.setStorageSync("groundingId", 1)
@@ -152,6 +402,7 @@ Page({
                 })
                 that.setData({
                   groundingList: groundingList,
+                  wareList: that.data.wareList
                 })
                 let groundingListTemp = wx.getStorageSync("groundingList") || []
                 groundingListTemp.push(groundingList[groundingList.length - 1])
@@ -200,7 +451,7 @@ Page({
           //   wx.setStorageSync('groundingcodetemp', temp)
           //   let tempTime = util.formatTime(new Date())
           //   wx.request({
-          //     url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
+          //     url: 'https://warehouse.superspeedus.com/admin/store_ins/done_by_logistics_number',
           //     data: {
           //       logistics_number: res.result,
           //       date: tempTime
@@ -267,22 +518,18 @@ Page({
   addWareScan: function(res) {
     let productIndex = res.currentTarget.dataset.productindex
     let productList = this.data.groundingList
-
-    function filterGroundinglist(element, index, array) {
-      return (element['groundingId'] == productList[productIndex]['groundingId'])
-    }
-    var that = this
     try {
       wx.scanCode({
         success: (res) => {
-          that.data.warecodetemp = res.result
-          let groundingListtemp = wx.getStorageSync("groundingList")
-          let groundingListtemp2 = groundingListtemp.filter(filterGroundinglist)[0]
-          groundingListtemp2['warecode'] = that.data.warecodetemp
-          wx.setStorageSync("groundingList", groundingListtemp)
-          that.setData({
-            groundingList: wx.getStorageSync('groundingList').filter(that.filterBatchs) || []
+          productList[productIndex]['warecode'] = res.result
+          for (let i = 0; i < productList.length; i++) {
+            productList[i]['selected'] = false
+          }
+          this.setData({
+            groundingList: productList,
+            batchList: []
           })
+          wx.setStorageSync("groundingList", this.data.groundingList)
         }
       })
     } catch (e) {
@@ -294,20 +541,36 @@ Page({
     let productIndex = e.currentTarget.dataset.productindex
     let productList = this.data.groundingList
     let timetemp2 = util.formatTime(new Date())
-    console.log(productList[productIndex]['scancode'])
-
-    function filterGroundinglist(element, index, array) {
-      return (element['groundingId'] == productList[productIndex]['groundingId'])
+    if (productList[productIndex]['warecode'] == '') {
+      wx.showModal({
+        title: '出错啦',
+        content: '请扫描库位',
+        showCancel: false
+      })
+      return
     }
-    let groundingListtemp = wx.getStorageSync("groundingList")
-    let groundingListtemp2 = groundingListtemp.filter(filterGroundinglist)[0]
+    console.log(productList[productIndex]['scancode'])
+    let fnsku = []
+    let ware_house_name = []
+    let sum = []
+    fnsku.push(productList[productIndex]['scancode'])
+    ware_house_name.push(productList[productIndex]['warecode'])
+    sum.push(productList[productIndex]['amount'])
+    // function filterGroundinglist(element, index, array) {
+    //   return (element['groundingId'] == productList[productIndex]['groundingId'])
+    // }
+    // let groundingListtemp = wx.getStorageSync("groundingList")
+    // let groundingListtemp2 = groundingListtemp.filter(filterGroundinglist)[0]
     var that = this
+    console.log('that.data.amount:')
+    console.log(productList)
     wx.request({
-      url: 'http://47.74.177.128:3000/admin/cargos/putaway_fnsku',
+      // url: app.globalData.baseurl + '/admin/cargos/putaway_fnsku',
+      url: app.globalData.baseurl + '/admin/cargos/putaway_fnsku',
       data: {
-        fnsku: groundingListtemp2['scancode'],
-        ware_house_id: groundingListtemp2['warecode'],
-        sum: that.data.amount,
+        fnsku: fnsku,
+        ware_house_name: ware_house_name,
+        sum: sum,
         date: util.formatTime(new Date())
       },
       header: {
@@ -316,10 +579,10 @@ Page({
       method: 'POST',
       success: function(res) {
         if (res.data.code == 200) {
-          groundingListtemp2['status'] = "成功"
-          groundingListtemp2['time'] = util.formatTime(new Date())
+          productList[productIndex]['status'] = "成功"
+          productList[productIndex]['time'] = util.formatTime(new Date())
         } else {
-          groundingListtemp2['status'] = "失败"
+          productList[productIndex]['status'] = "失败"
           // app.showErrorModal(res.data.message, "提示")
           wx.showModal({
             title: '出错啦',
@@ -327,10 +590,11 @@ Page({
             showCancel: false
           })
         }
-        groundingListtemp2['amount'] = that.data.amount
-        wx.setStorageSync("groundingList", groundingListtemp)
+        // groundingListtemp2['amount'] = that.data.amount
+        // wx.setStorageSync("groundingList", groundingListtemp)
+        wx.setStorageSync("groundingList", that.data.groundingList)
         that.setData({
-          groundingList: wx.getStorageSync('groundingList').filter(that.filterBatchs) || []
+          groundingList: productList
         })
       }
     })
@@ -442,7 +706,8 @@ Page({
       wx.setStorageSync('groundingcodetemp', temp)
       let tempTime = util.formatTime(new Date())
       wx.request({
-        url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
+        // url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
+        url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
         data: {
           logistics_number: e.detail.result,
           date: tempTime

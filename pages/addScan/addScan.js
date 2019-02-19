@@ -1,4 +1,5 @@
 // pages/addScan/addScan.js
+const app = getApp()
 const util = require('../../utils/util.js')
 const scanData = ({
 
@@ -13,7 +14,10 @@ const scanData = ({
     codetemp: '',
     scanArea: [],
     showModal: false,
-    logistics_number: ''
+    logistics_number: '',
+    batch_number: undefined,
+    batchList: [],
+    scancodetemp: []
   },
 
 
@@ -25,7 +29,7 @@ const scanData = ({
     this.data.batchId = options.id
     try {
       this.setData({
-        showList: wx.getStorageSync('showList').filter(this.filterBatchs) || []
+        showList: wx.getStorageSync('showList') || []
       })
     } catch (e) {
       console.log('showList is empty , filter is not a function')
@@ -100,6 +104,95 @@ const scanData = ({
       logistics_number: e.detail.value
     })
   },
+  bindBatchNumber: function (e) {
+    this.setData({
+      batch_number: e.detail.value
+    })
+  },
+  addBatchNumber: function() {
+    if (this.data.batch_number == undefined || this.data.batch_number.trim().length < 1) {
+      wx.showToast({
+        title: '请输入批次号',
+        icon: 'none',
+        duration: 1000
+      })
+      return
+    }
+    this.setData({
+      batchList: []
+    })
+    console.log(this.data.batch_number)
+    var that = this
+    wx.request({
+      // url: app.globalData.baseurl + '/admin/store_ins?batch_number=' + that.data.batch_number +'&status=7',
+      url: app.globalData.baseurl + '/admin/store_ins?batch_number=' + that.data.batch_number + '&status=7',
+      header: {
+        'Authorization': wx.getStorageSync('id_token'),
+      },
+      method: 'GET',
+      success: function (res) {
+        console.log(res)
+        if (res.data.code == 200) {
+          if(res.data.count != 0) {
+            for (let i = 0; i < Math.ceil(res.data.count / 20); i++) {
+              that.getBatchNumbers(i+1)
+            }
+          }
+          that.setData({
+            batchList: that.data.batchList
+          })
+          if(res.data.data.length ==0) {
+            wx.showModal({
+              title: '提示',
+              content: '暂无入库单',
+              showCancel: false
+            })
+          }
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: res.data.message,
+            showCancel: false
+          })
+        }
+        console.log(that.data.batchList)
+      },
+    })
+  },
+  getBatchNumbers: function(page) {
+    var that = this
+    wx.request({
+      // url: app.globalData.baseurl + '/admin/store_ins?page='+ page +'&batch_number=' + that.data.batch_number + '&status=7',
+      url: app.globalData.baseurl + '/admin/store_ins?page=' + page + '&batch_number=' + that.data.batch_number + '&status=7',
+      header: {
+        'Authorization': wx.getStorageSync('id_token'),
+      },
+      method: 'GET',
+      success: function (res) {
+        console.log(res)
+        if (res.data.code == 200) {
+          that.data.batchList = that.data.batchList.concat(res.data.data)
+          that.setData({
+            batchList: that.data.batchList
+          })
+          // if (res.data.data.length == 0) {
+          //   wx.showModal({
+          //     title: '提示',
+          //     content: '暂无入库单',
+          //     showCancel: false
+          //   })
+          // }
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: res.data.message,
+            showCancel: false
+          })
+        }
+        console.log(that.data.batchList)
+      },
+    })
+  },
   addLogisticsNumber: function() {
     if (this.data.logistics_number.trim().length < 1) {
       wx.showToast({
@@ -107,20 +200,18 @@ const scanData = ({
         icon: 'none',
         duration: 1000
       })
-      return false
+      return
     }
     var that = this
     this.data.codetemp = this.data.logistics_number
-    let showList = that.data.showList
-    let temp = wx.getStorageSync('scancodetemp') || []
-    let temp2 = temp.filter(this.filterBatchs)[0]['codes']
-    let status = ""
-    if (temp2.indexOf(this.data.codetemp) == -1) {
-      temp2.push(this.data.codetemp)
+    let productList = that.data.batchList
+    if (1) {
+      // temp2.push(this.data.codetemp)
       wx.setStorageSync('scancodetemp', temp)
       let tempTime = util.formatTime(new Date())
       wx.request({
-        url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
+        // url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
+        url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
         data: {
           logistics_number: this.data.codetemp,
           date: tempTime
@@ -132,35 +223,8 @@ const scanData = ({
         success: function (res) {
           console.log(res)
           if (res.data.code == 200) {
-            status = "成功"
-            showList.push({
-              time: tempTime,
-              scancode: that.data.codetemp,
-              id: that.data.batchId,
-              status: status
-            })
-            that.setData({
-              showList: showList,
-              logistics_number: ''
-            })
-            let showListTemp = wx.getStorageSync("showList") || []
-            showListTemp.push(showList[showList.length - 1])
-            wx.setStorageSync("showList", showListTemp)
-            that.hideModal();
+            productList[productIndex]['status'] = 4
           } else {
-            status = "失败"
-            showList.push({
-              time: tempTime,
-              scancode: that.data.codetemp,
-              id: that.data.batchId,
-              status: status
-            })
-            that.setData({
-              showList: showList,
-            })
-            let showListTemp = wx.getStorageSync("showList") || []
-            showListTemp.push(showList[showList.length - 1])
-            wx.setStorageSync("showList", showListTemp)
             wx.showModal({
               title: '提示',
               content: res.data.message,
@@ -187,70 +251,46 @@ const scanData = ({
       wx.scanCode({
         success: (res) => {
           this.data.codetemp = res.result
-          let showList = that.data.showList
-          let temp = wx.getStorageSync('scancodetemp') || []
-          let temp2 = temp.filter(this.filterBatchs)[0]['codes']
-          let status = ""
-          if (temp2.indexOf(res.result) == -1) {
-            temp2.push(res.result)
-            wx.setStorageSync('scancodetemp', temp)
-            let tempTime = util.formatTime(new Date())
-            wx.request({
-              url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
-              data: {
-                logistics_number: res.result,
-                date: tempTime
-              },
-              header: {
-                'Authorization': wx.getStorageSync('id_token'),
-              },
-              method: 'POST',
-              success: function(res) {
-                console.log(res)
-                if (res.data.code == 200) {
-                  status = "成功"
-                  showList.push({
-                    time: tempTime,
-                    scancode: that.data.codetemp,
-                    id: that.data.batchId,
-                    status: status
-                  })
-                  that.setData({
-                    showList: showList,
-                  })
-                  let showListTemp = wx.getStorageSync("showList") || []
-                  showListTemp.push(showList[showList.length - 1])
-                  wx.setStorageSync("showList", showListTemp)
-                } else {
-                  status = "失败"
-                  showList.push({
-                    time: tempTime,
-                    scancode: that.data.codetemp,
-                    id: that.data.batchId,
-                    status: status
-                  })
-                  that.setData({
-                    showList: showList,
-                  })
-                  let showListTemp = wx.getStorageSync("showList") || []
-                  showListTemp.push(showList[showList.length - 1])
-                  wx.setStorageSync("showList", showListTemp)
-                  wx.showModal({
-                    title: '提示',
-                    content: res.data.message,
-                  })
-                }
-              },
-            })
-
-          } else {
-            wx.showToast({
-              title: '重复啦',
-              icon: 'loading',
-              duration: 1000
-            })
+          let batchList = that.data.batchList
+          let resultIndex = undefined
+          for(let i=0; i<batchList.length; i++) {
+            if (batchList[i]['logistics_number'] == res.result) {
+              resultIndex = i
+              break
+            }
           }
+          console.log(resultIndex)
+          // if (1) {
+          //   let tempTime = util.formatTime(new Date())
+          //   wx.request({
+          //     url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
+          //     // url: 'https://warehouse.superspeedus.com/admin/store_ins/done_by_logistics_number',
+          //     data: {
+          //       logistics_number: res.result,
+          //       date: tempTime
+          //     },
+          //     header: {
+          //       'Authorization': wx.getStorageSync('id_token'),
+          //     },
+          //     method: 'POST',
+          //     success: function(res) {
+          //       if (res.data.code == 200) {
+          //       } else {
+          //         wx.showModal({
+          //           title: '提示',
+          //           content: res.data.message,
+          //         })
+          //       }
+          //     },
+          //   })
 
+          // } else {
+          //   wx.showToast({
+          //     title: '重复啦',
+          //     icon: 'loading',
+          //     duration: 1000
+          //   })
+          // }
         }
       })
     } catch (e) {
@@ -260,18 +300,14 @@ const scanData = ({
   },
   reupload: function(e) {
     let productIndex = e.currentTarget.dataset.productindex
-    let productList = this.data.showList
+    let productList = this.data.batchList
     let timetemp2 = util.formatTime(new Date())
-    console.log(productList[productIndex]['scancode'])
-
-    function filterShowlist(element, index, array) {
-      return (element['id'] == productList[productIndex]['id'])
-    }
     var that = this
     wx.request({
-      url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
+      // url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
+      url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
       data: {
-        logistics_number: productList[productIndex]['scancode'],
+        logistics_number: productList[productIndex]['logistics_number'],
         date: timetemp2
       },
       header: {
@@ -279,31 +315,21 @@ const scanData = ({
       },
       method: 'POST',
       success: function(res) {
-        let showListtemp = wx.getStorageSync("showList")
-        let showListtemp2 = showListtemp.filter(filterShowlist)
         if (res.data.code == 200) {
-          for (let i = 0; i < showListtemp2.length; i++) {
-            if (showListtemp2[i]['scancode'] == productList[productIndex]['scancode']) {
-              showListtemp2[i]['status'] = "成功"
-              showListtemp2[i]['time'] = timetemp2
-            }
-          }
+          productList[productIndex]['status'] = 4
         } else {
-          for (let i = 0; i < showListtemp2.length; i++) {
-            if (showListtemp2[i]['scancode'] == productList[productIndex]['scancode']) {
-              showListtemp2[i]['status'] = "失败"
-              showListtemp2[i]['time'] = timetemp2
-            }
-          }
+          productList[productIndex]['status'] = 8
           wx.showModal({
             title: '出错啦',
             content: res.data.message,
             showCancel: false
           })
         }
-        wx.setStorageSync("showList", showListtemp)
+        let temp = productList[productIndex]
+        productList.splice(productIndex, 1)
+        productList.unshift(temp)
         that.setData({
-          showList: wx.getStorageSync('showList').filter(that.filterBatchs) || []
+          batchList: productList
         })
       }
     })
@@ -401,7 +427,7 @@ const scanData = ({
     var that = this
     wx.showModal({
       title: '提示',
-      content: "确定重新入库吗？",
+      content: "确定入库吗？",
       success: function(res) {
         if (res.confirm) {
           that.reupload(e)
@@ -414,20 +440,37 @@ const scanData = ({
    * 一维码扫描
    */
   scanHandler: function(e) {
-    this.data.codetemp = e.detail.result
-    let showList = this.data.showList
-    let temp = wx.getStorageSync('scancodetemp') || []
-    let temp2 = temp.filter(this.filterBatchs)[0]['codes']
-    let status = ""
+    console.log(this.data.scancodetemp)
+    console.log(e.detail.result)
+    if(this.data.scancodetemp.indexOf(e.detail.result) != -1) {
+      return
+    }
+    this.data.scancodetemp.push(e.detail.result)
+    let tempTime = util.formatTime(new Date())
+    let batchList = this.data.batchList
+    let resultIndex = undefined
     var that = this
-    if (temp2.indexOf(e.detail.result) == -1) {
-      temp2.push(e.detail.result)
-      wx.setStorageSync('scancodetemp', temp)
-      let tempTime = util.formatTime(new Date())
+    that.data.codetemp = e.detail.result
+    for (let i = 0; i < batchList.length; i++) {
+      if (batchList[i]['logistics_number'] == that.data.codetemp) {
+        resultIndex = i
+        break
+      }
+    }
+    if(resultIndex == undefined) {
+      wx.showToast({
+        title: '请扫描正确的单号',
+        icon: 'none',
+        duration: 1000
+      })
+      return
+    }
+    if (1) {
       wx.request({
-        url: 'http://47.74.177.128:3000/admin/store_ins/done_by_logistics_number',
+        // url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
+        url: app.globalData.baseurl + '/admin/store_ins/done_by_logistics_number',
         data: {
-          logistics_number: e.detail.result,
+          logistics_number: batchList[resultIndex]['logistics_number'],
           date: tempTime
         },
         header: {
@@ -437,38 +480,21 @@ const scanData = ({
         success: function(res) {
           console.log(res)
           if (res.data.code == 200) {
-            status = "成功"
-            showList.push({
-              time: tempTime,
-              scancode: that.data.codetemp,
-              id: that.data.batchId,
-              status: status
-            })
-            that.setData({
-              showList: showList,
-            })
-            let showListTemp = wx.getStorageSync("showList") || []
-            showListTemp.push(showList[showList.length - 1])
-            wx.setStorageSync("showList", showListTemp)
+            batchList[resultIndex]['status'] = 4
           } else {
-            status = "失败"
-            showList.push({
-              time: tempTime,
-              scancode: that.data.codetemp,
-              id: that.data.batchId,
-              status: status
-            })
-            that.setData({
-              showList: showList,
-            })
-            let showListTemp = wx.getStorageSync("showList") || []
-            showListTemp.push(showList[showList.length - 1])
-            wx.setStorageSync("showList", showListTemp)
-            wx.showModal({
-              title: '提示',
-              content: res.data.message,
-            })
+            batchList[resultIndex]['status'] = 8
+            // wx.showModal({
+            //   title: '提示',
+            //   content: res.data.message,
+            // })
           }
+          let temp = batchList[resultIndex]
+          batchList.splice(resultIndex, 1)
+          batchList.unshift(temp)
+          that.setData({
+            batchList: batchList,
+            scancodetemp: that.data.scancodetemp
+          })
         },
       })
     } else {
@@ -478,7 +504,6 @@ const scanData = ({
         duration: 1000
       })
     }
-    console.log(e.detail.result);
   },
   error: function(e) {
     console.log(e);

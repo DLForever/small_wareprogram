@@ -82,9 +82,19 @@
   box-sizing: border-box;
 }
 
+.product-list .product-item-movable-success {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8rpx 0 20rpx 20rpx;
+  box-sizing: border-box;
+  background: rgb(102, 230, 160);
+}
+
 .product-list .product-item-movable .product-delete-icon {
   flex: 0 0 auto;
   margin-right: 18rpx;
+  margin-left: 18rpx;
   width: 44rpx;
   height: 44rpx;
 }
@@ -219,4 +229,35 @@ input-holder {
   width: 50%;
   color: #ec5300;
   text-align: center;
+}
+
+.send_msg {
+    width: 700rpx;
+    padding: 25rpx;  
+    /* background-color: #fff; */
+    /* min-height: 0; */
+    /* overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    border-top: 1px solid #f1f1f1;
+    border-bottom: 1px solid #f1f1f1; */
+    clear: both;
+}
+.send_ipt {
+    width: 500rpx;
+    padding: 8rpx;
+    font-size: 30rpx;
+    height: 40rpx;
+    line-height: 40rpx;
+    float: left;
+    /* background-color: #f5f5f5;
+    border-radius: 5px; */
+}
+.send_btn {
+    width: 120rpx;
+    height: 100rpx;
+    font-size: 26rpx;
+    line-height: 100rpx;
+    float: right;
 }

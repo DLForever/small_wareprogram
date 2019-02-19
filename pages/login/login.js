@@ -1,4 +1,5 @@
 // pages/login/login.js
+const app = getApp()
 Page({
 
   /**
@@ -6,8 +7,8 @@ Page({
    */
   data: {
     motto: '海外仓系统',
-    userName: 'linzihao',
-    userPassword: 'linzihao'
+    userName: '',
+    userPassword: ''
   },
 
   userNameInput: function(e) {
@@ -23,7 +24,10 @@ Page({
   logIn: function() {
     var that = this
     wx.request({
-      url: 'http://47.74.177.128:3000/admin/authentication',
+      // url: 'http://47.74.177.128/admin/authentication',
+      // url: 'http://47.74.177.128/authentication',
+      // url: 'https://warehouse.superspeedus.com/admin/authentication',
+      url: app.globalData.baseurl + '/admin/authentication',
       data: {
         username: this.data.userName,
         password: this.data.userPassword,

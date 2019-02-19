@@ -1,4 +1,5 @@
 // pages/scanList/scanList.js
+const app = getApp()
 Page({
 
   /**
@@ -74,7 +75,8 @@ Page({
     console.log(wx.getStorageSync('id_token'))
     var that = this
     wx.request({
-      url: 'http://47.74.177.128:3000/admin/store_ins',
+      // url: app.globalData.baseurl + '/admin/store_ins',
+      url: app.globalData.baseurl + '/admin/store_ins',
       data: {
 
       },

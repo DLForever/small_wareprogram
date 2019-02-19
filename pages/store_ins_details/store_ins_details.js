@@ -1,4 +1,5 @@
 // pages/store_ins_details/store_ins_details.js
+const app = getApp()
 Page({
 
   /**
@@ -81,7 +82,8 @@ Page({
     }
     var that = this
     wx.request({
-      url: 'http://47.74.177.128:3000/admin/store_ins/info',
+      // url: app.globalData.baseurl + '/admin/store_ins/info',
+      url: app.globalData.baseurl + '/admin/store_ins/info',
       header: {
         'Authorization': wx.getStorageSync('id_token'),
       },
@@ -115,7 +117,8 @@ Page({
     wx.scanCode({
       success: (res) => {
         wx.request({
-          url: 'http://47.74.177.128:3000/admin/store_ins/info',
+          // url: app.globalData.baseurl + '/admin/store_ins/info',
+          url: app.globalData.baseurl + '/admin/store_ins/info',
           header: {
             'Authorization': wx.getStorageSync('id_token'),
           },

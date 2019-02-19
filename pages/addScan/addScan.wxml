@@ -1,8 +1,17 @@
 <!--pages/addScan/addScan.wxml-->
 <view class="container">
-  <view class="section">
-    <input bindinput="bindTask" placeholder="输入物流单号" value="{{logistics_number}}"></input>
+  <view class="send_msg">
+    <input placeholder="输入批次号" value="{{batch_number}}" class="send_ipt" bindinput="bindBatchNumber"/>
+    <button type="default" class="send_btn" bindtap="addBatchNumber">确定</button>
   </view>
+  <view wx:if="{{batchList.length!=0}}">
+  <!-- <view class="send_msg">
+    <input placeholder="输入物流单号" value="{{logistics_number}}" class="send_ipt" bindinput="bindTask"/>
+    <button type="default" class="send_btn" bindtap="addLogisticsNumber">入库</button>
+  </view> -->
+  <!-- <view>
+    <input class="btn-area" bindinput="bindBatchNumber" placeholder="输入批次号" value="{{batch_number}} "/><button bindtap="addBatchNumber " style='diplay:inline-block;' type="default" size="mini">添加</button>
+  </view> -->
   <!--弹窗-->
   <!-- <view class="modal-mask" bindtap="hideModal" catchtouchmove="preventTouchMove" wx:if="{{showModal}}"></view>
   <view class="modal-dialog" wx:if="{{showModal}}">
@@ -17,29 +26,51 @@
       <view class="btn-confirm" bindtap="addLogisticsNumber" data-status="confirm">确定</view>
     </view>
   </view> -->
-  <view class="section">
+  <!-- <view class="section">
     <view class="btn-area">
       <button bindtap="addLogisticsNumber" type="default" size="mini">手动添加</button>
     </view>
     <view class="btn-area">
       <button bindtap="addScan" class="btn-scan" size="mini">单次扫码</button>
     </view>
-  </view>
-  <camera style="width: 100%; height: 300px;" mode="scanCode" bindscancode="scanHandler" scan-area="[0, 0, 300, 300]" binderror="error">
+  </view> -->
+  <camera style="width: 100%; height: 200px;" mode="scanCode" bindscancode="scanHandler" scan-area="[0, 0, 300, 300]" binderror="error">
   </camera>
-  <view class="btn-area">连续扫描一维码</view>
   <view class="product-list">
-    <view class="product-item" wx:for="{{showList}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
+    <view class="product-item" wx:for="{{batchList}}" wx:for-item="product" wx:for-index="index" wx:key="index" id="{{product.id}}">
       <movable-area>
         <movable-view out-of-bounds="true" direction="horizontal" x="{{product.xmove}}" inertia="true" data-productIndex="{{index}}" bindchange="handleMovableChange">
-          <view class="product-item-movable">
+          <view wx:if="{{product.status == 4}}" class="product-item-movable" style='background: rgb(102, 230, 160);'>
+            <view>{{index+1}} </view> 
             <image class="product-delete-icon" src="../../images/icon-upload.png" data-productIndex="{{index}}" bindtap="upload"></image>
             <view class="product-movable-item">
-              <view class="product-movable-item-name">{{product.scancode}}</view>
-              <view class="product-movable-item-code">{{product.time}}</view>
+              <view class="product-movable-item-name">{{product.logistics_number}}</view>
+              <view class="product-movable-item-code">{{product.user_remark}}</view>
             </view>
             <view class="product-movable-item product-movable-item-amount">
-              <text>{{product.status}}</text>
+              <text>{{product.total_plan_sum}}</text>
+            </view>
+          </view>
+          <view wx:elif="{{product.status == 8}}" class="product-item-movable" style='background: #E66671;'>
+            <view>{{index+1}} </view>
+            <image class="product-delete-icon" src="../../images/icon-upload.png" data-productIndex="{{index}}" bindtap="upload"></image>
+            <view class="product-movable-item">
+              <view class="product-movable-item-name">{{product.logistics_number}}</view>
+              <view class="product-movable-item-code">{{product.user_remark}}</view>
+            </view>
+            <view class="product-movable-item product-movable-item-amount">
+              <text>{{product.total_plan_sum}}</text>
+            </view>
+          </view>
+          <view wx:else class="product-item-movable">
+            <view>{{index+1}} </view> 
+            <image class="product-delete-icon" src="../../images/icon-upload.png" data-productIndex="{{index}}" bindtap="upload"></image>
+            <view class="product-movable-item">
+              <view class="product-movable-item-name">{{product.logistics_number}}</view>
+              <view class="product-movable-item-code">{{product.user_remark}}</view>
+            </view>
+            <view class="product-movable-item product-movable-item-amount">
+              <text>{{product.total_plan_sum}}</text>
             </view>
           </view>
         </movable-view>
@@ -47,8 +78,10 @@
       <view class="delete-btn" data-productIndex="{{index}}" bindtap="delet">删除</view>
     </view>
   </view>
-  <view wx:if="{{showList.length==0}}" class="remind-box">
+  </view>
+  <!-- <view></view> -->
+  <!-- <view wx:if="{{showList.length==0}}" class="remind-box">
     <image class="remind-img" src="/images/nothing.png"></image>
     <text class="remind-text">暂无数据</text>
-  </view>
+  </view> -->
 </view>

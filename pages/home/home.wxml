@@ -5,7 +5,7 @@
 
   <view class="list-box">
     <view class="newest-list">
-      <navigator url="../index/index">
+      <navigator url="../addScan/addScan">
         <image src="../../images/s4.png"></image>
         <view class="newest-text">
           <text>入库</text>
@@ -13,7 +13,7 @@
       </navigator>
     </view>
     <view class="newest-list">
-      <navigator url="../addGrounding/addGrounding">
+      <navigator url="../addGroundingScan/addGroundingScan">
         <image src="../../images/s5.png"></image>
         <view class="newest-text">
           <text>上架</text>

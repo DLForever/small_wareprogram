@@ -1,4 +1,5 @@
 // pages/pick/pick.js
+const app = getApp()
 Page({
 
   /**
@@ -68,7 +69,8 @@ Page({
       success: (res) => {
         console.log(res.result)
         wx.request({
-          url: 'http://47.74.177.128:3000/admin/outbound_orders/' + res.result.split('_')[1] + '/done_pick',
+          // url: app.globalData.baseurl + '/admin/outbound_orders/' + res.result.split('_')[1] + '/done_pick',
+          url: app.globalData.baseurl + '/admin/outbound_orders/' + res.result.split('_')[1] + '/done_pick',
           header: {
             'Authorization': wx.getStorageSync('id_token'),
           },
